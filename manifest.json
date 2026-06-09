@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "FocusTracker",
+  "version": "1.0",
+  "description": "Track focus and tab switching behavior",
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
