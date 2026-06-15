@@ -3,12 +3,16 @@
   "name": "FocusTracker",
   "version": "1.0",
   "description": "Track focus and tab switching behavior",
+
   "permissions": [
     "tabs",
-    "storage"
+    "storage",
+    "downloads"
   ],
+  
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html"
