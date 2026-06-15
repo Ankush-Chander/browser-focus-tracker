@@ -1,18 +1,42 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Focus Tracker</title>
-  <link rel="stylesheet" href="popup.css">
+    <meta charset="UTF-8">
+    <title>Focus Tracker</title>
+    <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
 
-  <h2>Focus Tracker</h2>
+    <h1>Focus Tracker</h1>
 
-  <div id="stats">
-    Loading...
-  </div>
+    <div id="focusScore" class="stat"></div>
 
-  <script src="popup.js"></script>
+    <div id="switches" class="stat"></div>
+
+    <div id="productiveTime" class="stat"></div>
+
+    <div id="distractingTime" class="stat"></div>
+
+    <div id="totalTime" class="stat"></div>
+
+    <div id="neutralTime" class="stat"></div>
+
+    <h2>Top Sites</h2>
+
+    <div id="sites"></div>
+
+    <button id="exportBtn">
+        Export JSON
+    </button>
+
+    <button id="resetBtn">
+        Reset Today
+    </button>
+
+    <script type="module" src="popup.js"></script>
 
 </body>
+
 </html>

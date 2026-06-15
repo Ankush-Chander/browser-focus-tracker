@@ -1,13 +1,47 @@
 body {
-  width: 300px;
-  padding: 15px;
-  font-family: Arial, sans-serif;
+    width: 350px;
+    padding: 15px;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
 }
 
 h2 {
-  text-align: center;
+    margin-top: 15px;
 }
 
-.website {
-  margin: 5px 0;
+#focusScore {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.stat {
+    margin-bottom: 10px;
+}
+
+.site {
+    padding: 6px;
+    border-bottom: 1px solid #ddd;
+}
+
+.good {
+    color: #2ecc71;
+}
+
+.average {
+    color: #f1c40f;
+}
+
+.poor {
+    color: #e74c3c;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    cursor: pointer;
 }
