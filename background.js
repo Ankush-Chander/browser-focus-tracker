@@ -1,102 +1,131 @@
-function getDomain(url) {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return null;
-  }
+import {
+    getToday,
+    getDomain
+} from "./utils.js";
+
+async function initializeToday() {
+    const result = await chrome.storage.local.get("dailyStats");
+
+    const dailyStats = result.dailyStats || {};
+
+    const today = getToday();
+
+    if (!dailyStats[today]) {
+        dailyStats[today] = {
+            sites: {},
+            switches: 0,
+            shortVisits: 0
+        };
+
+        await chrome.storage.local.set({
+            dailyStats
+        });
+    }
 }
 
 async function saveCurrentSession() {
-  const data = await chrome.storage.local.get([
-    "activeDomain",
-    "sessionStart",
-    "websites"
-  ]);
 
-  const activeDomain = data.activeDomain;
-  const sessionStart = data.sessionStart;
+    const storage =
+        await chrome.storage.local.get([
+            "activeDomain",
+            "sessionStart",
+            "dailyStats"
+        ]);
 
-  if (!activeDomain || !sessionStart) return;
+    const domain = storage.activeDomain;
+    const start = storage.sessionStart;
 
-  const duration = Date.now() - sessionStart;
+    if (!domain || !start) {
+        return;
+    }
 
-  const websites = data.websites || {};
+    const duration = Date.now() - start;
 
-  websites[activeDomain] =
-    (websites[activeDomain] || 0) + duration;
+    const today = getToday();
 
-  await chrome.storage.local.set({
-    websites
-  });
+    const dailyStats =
+        storage.dailyStats || {};
+
+    if (!dailyStats[today]) {
+        dailyStats[today] = {
+            sites: {},
+            switches: 0,
+            shortVisits: 0
+        };
+    }
+
+    dailyStats[today].sites[domain] =
+        (dailyStats[today].sites[domain] || 0)
+        + duration;
+
+    if (duration < 10000) {
+        dailyStats[today].shortVisits++;
+    }
+
+    await chrome.storage.local.set({
+        dailyStats
+    });
+
+    console.log(
+        "Saved",
+        domain,
+        duration
+    );
 }
 
-chrome.runtime.onSuspend.addListener(async () => {
-  await saveCurrentSession();
-});
+chrome.runtime.onInstalled.addListener(async () => {
 
-chrome.windows.onFocusChanged.addListener(
-  async (windowId) => {
+    console.log("Installed");
 
-    if (
-      windowId ===
-      chrome.windows.WINDOW_ID_NONE
-    ) {
-
-      await saveCurrentSession();
-
-    }
-  }
-);
-
-chrome.runtime.onInstalled.addListener(() => {
-
-  chrome.storage.local.set({
-    websites: {},
-    tabSwitches: 0
-  });
-
+    await initializeToday();
 });
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
 
-  await saveCurrentSession();
+    console.log("Tab switched");
 
-  const tab = await chrome.tabs.get(activeInfo.tabId);
+    await saveCurrentSession();
 
-  if (!tab.url) return;
+    const tab =
+        await chrome.tabs.get(
+            activeInfo.tabId
+        );
 
-  const domain = getDomain(tab.url);
+    if (!tab.url) return;
 
-  if (
-    domain === null ||
-    tab.url.startsWith("chrome://")
-  ) {
-    return;
-  }
+    const domain =
+        getDomain(tab.url);
 
-  const data =
-    await chrome.storage.local.get("initialized");
+    if (!domain) return;
 
-  if (data.initialized) {
+    await initializeToday();
 
-    const stats =
-      await chrome.storage.local.get("tabSwitches");
+    const storage =
+        await chrome.storage.local.get([
+            "dailyStats",
+            "activeDomain"
+        ]);
+
+    const today =
+        getToday();
+
+        if (storage.activeDomain) {
+            storage.dailyStats[today].switches++;
+        }
 
     await chrome.storage.local.set({
-      tabSwitches: (stats.tabSwitches || 0) + 1
+        dailyStats:
+            storage.dailyStats,
+
+        activeDomain:
+            domain,
+
+        sessionStart:
+            Date.now()
     });
 
-  } else {
-
-    await chrome.storage.local.set({
-      initialized: true
-    });
-
-  }
-
-  await chrome.storage.local.set({
-    activeDomain: domain,
-    sessionStart: Date.now()
-  });
-
+    console.log(
+        "Tracking",
+        domain
+    );
 });
