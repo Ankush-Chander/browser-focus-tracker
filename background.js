@@ -18,7 +18,8 @@ async function initializeToday() {
         };
 
         await chrome.storage.local.set({
-            dailyStats
+            dailyStats,
+            sessionStart: Date.now()
         });
     }
 }
@@ -50,7 +51,9 @@ async function saveCurrentSession() {
         dailyStats[today] = {
             sites: {},
             switches: 0,
-            shortVisits: 0
+            shortVisits: 0,
+            focusScore: 0,
+            sessions: []
         };
     }
 
@@ -93,6 +96,20 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 
     if (!tab.url) return;
 
+    if (
+
+       tab.url.startsWith("chrome://") ||
+
+        tab.url.startsWith("chrome-extension://") ||
+
+        tab.url.startsWith("edge://")
+
+    ) {
+
+        return;
+
+    }
+
     const domain =
         getDomain(tab.url);
 
@@ -129,3 +146,11 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
         domain
     );
 });
+
+setInterval(
+
+    saveCurrentSession,
+
+    30000
+
+);
