@@ -207,3 +207,14 @@ rgba(0,0,0,0.08);
 font-size:18px;
 
 }
+
+.card p{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.card:hover{
+    transform:translateY(-4px);
+    transition:0.2s;
+}
