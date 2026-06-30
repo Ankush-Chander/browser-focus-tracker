@@ -170,31 +170,97 @@ document.getElementById(
 "topSites"
 );
 
-topSites.forEach(
-([domain,time])=>{
+topSites.forEach(([domain,time]) => {
 
-const div=
-document.createElement("div");
+    const div = document.createElement("div");
 
-div.className="site";
+    div.className = "site";
 
-div.innerHTML=`
+    div.innerHTML = `
+        <strong>${domain}</strong><br>
+        ${formatTime(time)}
+    `;
 
-<strong>
-
-${domain}
-
-</strong>
-
-<br>
-
-${formatTime(time)}
-
-`;
-container.appendChild(div);
+    container.appendChild(div);
 
 });
 
-}
+
+// ---------------------------
+// Weekly Statistics
+// ---------------------------
+
+const allDays =
+Object.entries(storage.dailyStats || {})
+.sort((a,b)=>b[0].localeCompare(a[0]))
+.slice(0,7);
+
+let weeklyScore = 0;
+let weeklyTime = 0;
+let weeklySwitches = 0;
+
+let bestScore = -1;
+let bestDay = "-";
+
+let worstScore = 101;
+let worstDay = "-";
+
+allDays.forEach(([date,data])=>{
+
+    const dayScore = calculateFocusScore(data);
+
+    weeklyScore += dayScore;
+
+    weeklySwitches += data.switches;
+
+    let dayTime = 0;
+
+    Object.values(data.sites).forEach(time=>{
+
+        dayTime += time;
+
+    });
+
+    weeklyTime += dayTime;
+
+    if(dayScore > bestScore){
+
+        bestScore = dayScore;
+        bestDay = date;
+
+    }
+
+    if(dayScore < worstScore){
+
+        worstScore = dayScore;
+        worstDay = date;
+
+    }
+
+});
+
+const average =
+allDays.length
+?
+Math.round(weeklyScore / allDays.length)
+:
+0;
+
+document.getElementById("weeklyAverage").textContent =
+`${average}/100`;
+
+document.getElementById("bestDay").textContent =
+`${bestDay} (${bestScore})`;
+
+document.getElementById("worstDay").textContent =
+`${worstDay} (${worstScore})`;
+
+document.getElementById("weeklyTime").textContent =
+formatTime(weeklyTime);
+
+document.getElementById("weeklySwitches").textContent =
+weeklySwitches;
+
+}   // <-- loadDashboard() ends HERE
 
 loadDashboard();
