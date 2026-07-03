@@ -49,6 +49,63 @@ return Math.max(
 
 }
 
+function calculateTotalTime(sites){
+
+    let total = 0;
+
+    Object.values(sites).forEach(time=>{
+
+        total += time;
+
+    });
+
+    return total;
+
+}
+
+function loadHistoryTable(dailyStats){
+
+    const body =
+    document.getElementById("historyBody");
+
+    body.innerHTML="";
+
+    const days =
+    Object.entries(dailyStats)
+
+    .sort((a,b)=>b[0].localeCompare(a[0]))
+
+    .slice(0,7);
+
+    days.forEach(([date,stats])=>{
+
+        const row =
+        document.createElement("tr");
+
+        const score =
+        calculateFocusScore(stats);
+
+        const total =
+        calculateTotalTime(stats.sites);
+
+        row.innerHTML=`
+
+            <td>${date}</td>
+
+            <td>${score}/100</td>
+
+            <td>${formatTime(total)}</td>
+
+            <td>${stats.switches}</td>
+
+        `;
+
+        body.appendChild(row);
+
+    });
+
+}
+
 async function loadDashboard(){
 
 
@@ -170,6 +227,8 @@ document.getElementById(
 "topSites"
 );
 
+container.innerHTML = "";
+
 topSites.forEach(([domain,time]) => {
 
     const div = document.createElement("div");
@@ -261,6 +320,8 @@ formatTime(weeklyTime);
 document.getElementById("weeklySwitches").textContent =
 weeklySwitches;
 
-}   // <-- loadDashboard() ends HERE
+loadHistoryTable(storage.dailyStats || {});
+
+}   
 
 loadDashboard();

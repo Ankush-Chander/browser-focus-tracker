@@ -218,3 +218,51 @@ font-size:18px;
     transform:translateY(-4px);
     transition:0.2s;
 }
+
+/* ------------------------- */
+/* History Table */
+/* ------------------------- */
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+margin-top:20px;
+
+background:white;
+
+border-radius:10px;
+
+overflow:hidden;
+
+box-shadow:0 4px 10px rgba(0,0,0,.08);
+
+}
+
+th{
+
+background:#4CAF50;
+
+color:white;
+
+padding:15px;
+
+}
+
+td{
+
+padding:15px;
+
+text-align:center;
+
+border-bottom:1px solid #eee;
+
+}
+
+tr:hover{
+
+background:#f8f8f8;
+
+}
