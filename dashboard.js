@@ -1,327 +1,298 @@
-function getToday(){
+function getToday() {
+    return new Date().toISOString().split("T")[0];
+}
 
-return new Date()
-.toISOString()
-.split("T")[0];
+function formatTime(ms) {
+    const mins = Math.floor(ms / 60000);
+    const hrs = Math.floor(mins / 60);
+
+    if (hrs > 0) {
+        return `${hrs}h ${mins % 60}m`;
+    }
+
+    return `${mins}m`;
+}
+
+function calculateFocusScore(stats) {
+
+    if (!stats) return 0;
+
+    let score = 100;
+
+    score -= (stats.switches || 0) * 1.5;
+    score -= (stats.shortVisits || 0) * 3;
+
+    const siteCount =
+        Object.keys(stats.sites || {}).length;
+
+    if (siteCount > 15) {
+        score -= 10;
+    }
+
+    return Math.max(
+        0,
+        Math.min(100, Math.round(score))
+    );
+}
+
+function calculateTotalTime(sites) {
+
+    return Object.values(sites || {}).reduce(
+        (sum, value) => sum + value,
+        0
+    );
 
 }
 
-function formatTime(ms){
+function updateFocusCard(score) {
 
-const mins=Math.floor(ms/60000);
+    const scoreElement =
+        document.getElementById("focusScore");
 
-const hrs=Math.floor(mins/60);
+    const labelElement =
+        document.getElementById("focusLabel");
 
-if(hrs>0){
+    scoreElement.textContent = `${score}/100`;
 
-return `${hrs}h ${mins%60}m`;
+    scoreElement.className = "score";
 
-}
+    if (score >= 80) {
 
-return `${mins}m`;
+        scoreElement.classList.add("green");
+        labelElement.textContent = "Highly Focused";
 
-}
+    }
 
-function calculateFocusScore(stats){
+    else if (score >= 50) {
 
-let score=100;
+        scoreElement.classList.add("orange");
+        labelElement.textContent = "Moderately Focused";
 
-score-=stats.switches*1.5;
+    }
 
-score-=stats.shortVisits*3;
+    else {
 
-const sites=
-Object.keys(stats.sites).length;
+        scoreElement.classList.add("red");
+        labelElement.textContent = "Distracted";
 
-if(sites>15){
-
-score-=10;
-
-}
-
-return Math.max(
-    0,
-    Math.min(
-        100,
-        Math.round(score)
-    )
-);
+    }
 
 }
 
-function calculateTotalTime(sites){
+function updateTodayStats(stats) {
 
-    let total = 0;
-
-    Object.values(sites).forEach(time=>{
-
-        total += time;
-
-    });
-
-    return total;
-
-}
-
-function loadHistoryTable(dailyStats){
-
-    const body =
-    document.getElementById("historyBody");
-
-    body.innerHTML="";
-
-    const days =
-    Object.entries(dailyStats)
-
-    .sort((a,b)=>b[0].localeCompare(a[0]))
-
-    .slice(0,7);
-
-    days.forEach(([date,stats])=>{
-
-        const row =
-        document.createElement("tr");
-
-        const score =
-        calculateFocusScore(stats);
-
-        const total =
+    const total =
         calculateTotalTime(stats.sites);
 
-        row.innerHTML=`
+    document.getElementById("browsingTime").textContent =
+        `Total Browsing Time : ${formatTime(total)}`;
 
-            <td>${date}</td>
+    document.getElementById("switches").textContent =
+        `Tab Switches : ${stats.switches || 0}`;
 
-            <td>${score}/100</td>
+    document.getElementById("siteCount").textContent =
+        `Sites Visited : ${Object.keys(stats.sites || {}).length}`;
 
-            <td>${formatTime(total)}</td>
+}
 
-            <td>${stats.switches}</td>
+function updateTopSites(stats) {
 
-        `;
+    const container =
+        document.getElementById("topSites");
 
-        body.appendChild(row);
+    container.innerHTML = "";
+
+    Object.entries(stats.sites || {})
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .forEach(([domain, time], index) => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "site";
+
+            div.innerHTML = `
+                <strong>#${index + 1} ${domain}</strong>
+                <br>
+                ${formatTime(time)}
+            `;
+
+            container.appendChild(div);
+
+        });
+
+}
+
+function calculateWeeklySummary(dailyStats) {
+
+    const days =
+        Object.entries(dailyStats || {})
+            .sort((a, b) => b[0].localeCompare(a[0]))
+            .slice(0, 7);
+
+    let totalScore = 0;
+    let totalTime = 0;
+    let totalSwitches = 0;
+
+    let bestScore = -1;
+    let bestDay = "-";
+
+    let worstScore = 101;
+    let worstDay = "-";
+
+    days.forEach(([date, stats]) => {
+
+        const score =
+            calculateFocusScore(stats);
+
+        const time =
+            calculateTotalTime(stats.sites);
+
+        totalScore += score;
+        totalTime += time;
+        totalSwitches += stats.switches || 0;
+
+        if (score > bestScore) {
+
+            bestScore = score;
+            bestDay = date;
+
+        }
+
+        if (score < worstScore) {
+
+            worstScore = score;
+            worstDay = date;
+
+        }
 
     });
 
-}
+    return {
 
-async function loadDashboard(){
+        average:
+            days.length
+                ? Math.round(totalScore / days.length)
+                : 0,
 
+        bestDay,
+        bestScore,
 
-const storage=
-await chrome.storage.local.get(
-"dailyStats"
-);
+        worstDay,
+        worstScore,
 
+        weeklyTime: totalTime,
 
-const today=getToday();
+        weeklySwitches: totalSwitches
 
-const stats=
-storage.dailyStats?.[today];
-
-
-if(!stats){
-
-document.body.innerHTML+=
-"<h2>No data available</h2>";
-
-return;
+    };
 
 }
 
-const score =
-calculateFocusScore(stats);
+function updateWeeklySummary(dailyStats) {
 
-const scoreElement =
-document.getElementById(
-"focusScore"
-);
+    const weekly =
+        calculateWeeklySummary(dailyStats);
 
-const labelElement =
-document.getElementById(
-"focusLabel"
-);
+    document.getElementById("weeklyAverage").textContent =
+        `${weekly.average}/100`;
 
-scoreElement.textContent =
-`${score}/100`;
+    document.getElementById("bestDay").textContent =
+        `${weekly.bestDay} (${weekly.bestScore})`;
 
-scoreElement.classList.remove(
-"green",
-"orange",
-"red"
-);
+    document.getElementById("worstDay").textContent =
+        `${weekly.worstDay} (${weekly.worstScore})`;
 
+    document.getElementById("weeklyTime").textContent =
+        formatTime(weekly.weeklyTime);
 
-if(score>=80){
-
-scoreElement.classList.add(
-"green"
-);
-
-labelElement.textContent=
-
-"Highly Focused";
+    document.getElementById("weeklySwitches").textContent =
+        weekly.weeklySwitches;
 
 }
 
-else if(score>=50){
+function updateHistoryTable(dailyStats) {
 
-scoreElement.classList.add(
-"orange"
-);
+    const body =
+        document.getElementById("historyBody");
 
-labelElement.textContent=
+    body.innerHTML = "";
 
-"Moderately Focused";
+    Object.entries(dailyStats || {})
+        .sort((a, b) => b[0].localeCompare(a[0]))
+        .slice(0, 7)
+        .forEach(([date, stats]) => {
+
+            const row =
+                document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${date}</td>
+                <td>${calculateFocusScore(stats)}/100</td>
+                <td>${formatTime(calculateTotalTime(stats.sites))}</td>
+                <td>${stats.switches || 0}</td>
+            `;
+
+            body.appendChild(row);
+
+        });
 
 }
 
-else{
+function showNoData() {
 
-scoreElement.classList.add(
-"red"
-);
-
-labelElement.textContent=
-
-"Distracted";
+    document.body.innerHTML +=
+        "<h2 style='text-align:center'>No data available for today.</h2>";
 
 }
-let total=0;
 
-Object.values(stats.sites)
-.forEach(time=>{
+async function loadDashboard() {
 
-total+=time;
+    try {
 
-});
+        const storage =
+            await chrome.storage.local.get("dailyStats");
 
-document.getElementById(
-"browsingTime"
-).textContent=
+        const dailyStats =
+            storage.dailyStats || {};
 
-`Total Browsing Time : ${formatTime(total)}`;
+        const today =
+            getToday();
 
-document.getElementById(
-"switches"
-).textContent=
+        const stats =
+            dailyStats[today];
 
-`Tab Switches : ${stats.switches}`;
+        if (!stats) {
 
-document.getElementById(
-"siteCount"
-).textContent=
+            showNoData();
+            return;
 
-`Sites Visited : ${Object.keys(stats.sites).length}`;
+        }
 
-const topSites=
-Object.entries(stats.sites)
+        updateFocusCard(
+            calculateFocusScore(stats)
+        );
 
-.sort((a,b)=>b[1]-a[1])
+        updateTodayStats(stats);
 
-.slice(0,10);
+        updateTopSites(stats);
 
-const container=
-document.getElementById(
-"topSites"
-);
+        updateWeeklySummary(dailyStats);
 
-container.innerHTML = "";
-
-topSites.forEach(([domain,time]) => {
-
-    const div = document.createElement("div");
-
-    div.className = "site";
-
-    div.innerHTML = `
-        <strong>${domain}</strong><br>
-        ${formatTime(time)}
-    `;
-
-    container.appendChild(div);
-
-});
-
-
-// ---------------------------
-// Weekly Statistics
-// ---------------------------
-
-const allDays =
-Object.entries(storage.dailyStats || {})
-.sort((a,b)=>b[0].localeCompare(a[0]))
-.slice(0,7);
-
-let weeklyScore = 0;
-let weeklyTime = 0;
-let weeklySwitches = 0;
-
-let bestScore = -1;
-let bestDay = "-";
-
-let worstScore = 101;
-let worstDay = "-";
-
-allDays.forEach(([date,data])=>{
-
-    const dayScore = calculateFocusScore(data);
-
-    weeklyScore += dayScore;
-
-    weeklySwitches += data.switches;
-
-    let dayTime = 0;
-
-    Object.values(data.sites).forEach(time=>{
-
-        dayTime += time;
-
-    });
-
-    weeklyTime += dayTime;
-
-    if(dayScore > bestScore){
-
-        bestScore = dayScore;
-        bestDay = date;
+        updateHistoryTable(dailyStats);
 
     }
 
-    if(dayScore < worstScore){
+    catch (error) {
 
-        worstScore = dayScore;
-        worstDay = date;
+        console.error(error);
+
+        document.body.innerHTML +=
+            "<h2 style='text-align:center'>Unable to load dashboard.</h2>";
 
     }
 
-});
-
-const average =
-allDays.length
-?
-Math.round(weeklyScore / allDays.length)
-:
-0;
-
-document.getElementById("weeklyAverage").textContent =
-`${average}/100`;
-
-document.getElementById("bestDay").textContent =
-`${bestDay} (${bestScore})`;
-
-document.getElementById("worstDay").textContent =
-`${worstDay} (${worstScore})`;
-
-document.getElementById("weeklyTime").textContent =
-formatTime(weeklyTime);
-
-document.getElementById("weeklySwitches").textContent =
-weeklySwitches;
-
-loadHistoryTable(storage.dailyStats || {});
-
-}   
+}
 
 loadDashboard();
