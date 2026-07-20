@@ -1,133 +1,213 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Focus Tracker — Attention Log</title>
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <header class="masthead">
+        <p class="label">Focus Tracker</p>
+        <h1>Attention Log <span class="dateline" id="dateline">—</span></h1>
+      </header>
 
-<head>
+      <section class="reading" id="readingSection">
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 200 128" class="gauge" aria-hidden="true">
+            <path class="zone zone-low" d="M 10 110 A 90 90 0 0 1 100 20" />
+            <path class="zone zone-mid" d="M 100 20 A 90 90 0 0 1 172.8 57.1" />
+            <path
+              class="zone zone-high"
+              d="M 172.8 57.1 A 90 90 0 0 1 190 110"
+            />
 
-<meta charset="UTF-8">
+            <g id="needleGroup" transform="rotate(-90 100 110)">
+              <line x1="100" y1="110" x2="100" y2="40" class="needle" />
+              <circle cx="100" cy="110" r="5.5" class="pivot" />
+            </g>
 
-<title>Focus Dashboard</title>
+            <text x="10" y="125" class="tick-label">0</text>
+            <text x="100" y="14" class="tick-label" text-anchor="middle">
+              50
+            </text>
+            <text x="190" y="125" class="tick-label" text-anchor="end">
+              100
+            </text>
+          </svg>
 
-<link rel="stylesheet"
-href="dashboard.css">
+          <div class="reading-value">
+            <span id="focusScore" class="score">--</span
+            ><span class="score-suffix">/100</span>
+          </div>
 
-</head>
+          <p id="focusLabel" class="reading-label">—</p>
 
-<body>
+          <p class="empty-note" id="emptyNote">
+            No signal yet today — browse a bit, then check back.
+          </p>
+        </div>
 
-<div class="container">
+        <dl class="readouts">
+          <div class="readout">
+            <dt>Browsing time</dt>
+            <dd id="browsingTime">--</dd>
+          </div>
+          <div class="readout">
+            <dt>Tab switches</dt>
+            <dd id="switches">--</dd>
+          </div>
+          <div class="readout">
+            <dt>Sites visited</dt>
+            <dd id="siteCount">--</dd>
+          </div>
+          <div class="readout">
+            <dt>Peak open tabs</dt>
+            <dd id="maxTabs">--</dd>
+          </div>
+        </dl>
+      </section>
 
-<h1>Focus Dashboard</h1>
+      <section class="panel">
+        <h2>Weekly signal</h2>
+        <p class="panel-sub">Last 7 days</p>
 
-<div class="cards">
+        <div class="trend" id="trend"></div>
 
-<div class="card">
+        <dl class="readouts readouts--row">
+          <div class="readout">
+            <dt>Average</dt>
+            <dd id="weeklyAverage">--</dd>
+            <p id="weeklyDelta" class="weekly-delta">--</p>
+          </div>
+          <div class="readout">
+            <dt>Best day</dt>
+            <dd id="bestDay">--</dd>
+          </div>
+          <div class="readout">
+            <dt>Needs work</dt>
+            <dd id="worstDay">--</dd>
+          </div>
+          <div class="readout">
+            <dt>Total time</dt>
+            <dd id="weeklyTime">--</dd>
+          </div>
+          <div class="readout">
+            <dt>Total switches</dt>
+            <dd id="weeklySwitches">--</dd>
+          </div>
+        </dl>
+      </section>
 
-<h3>Focus Score</h3>
+      <section class="panel">
+        <h2>Log</h2>
+        <p class="panel-sub">History</p>
 
-<div id="focusScore"
-class="score"></div>
+        <table class="log">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Score</th>
+              <th>Time</th>
+              <th>Switches</th>
+              <th>Peak tabs</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
 
-<div id="focusLabel"></div>
+        <p class="empty-note" id="logEmptyNote">Nothing logged yet.</p>
+      </section>
 
-</div>
+      <section class="panel panel--split">
+        <div id="insightsBlock">
+          <h2>Insights</h2>
+          <p class="panel-sub">Today</p>
+          <dl class="readouts">
+            <div class="readout">
+              <dt>Longest session</dt>
+              <dd id="longestSession">--</dd>
+            </div>
+            <div class="readout">
+              <dt>Average session</dt>
+              <dd id="averageSession">--</dd>
+            </div>
+            <div class="readout">
+              <dt>Grade</dt>
+              <dd id="productivityGrade">--</dd>
+            </div>
+          </dl>
+          <p class="tip" id="productivityTip">--</p>
+        </div>
 
+        <div id="topSitesBlock">
+          <h2>Top sites</h2>
+          <p class="panel-sub">Today</p>
+          <ol class="sites" id="topSites"></ol>
+        </div>
+      </section>
 
-<div class="card">
+      <section class="panel">
+        <h2>Weekly report</h2>
+        <p class="panel-sub">Downloadable summary</p>
 
-<h3>Total Time</h3>
+        <div class="report-card">
+          <div class="report-grid">
+            <div>
+              <span>Average Focus Score</span>
+              <strong id="reportAverage">--</strong>
+            </div>
 
-<p id="browsingTime"></p>
+            <div>
+              <span>Best Day</span>
+              <strong id="reportBestDay">--</strong>
+            </div>
 
-</div>
+            <div>
+              <span>Needs Improvement</span>
+              <strong id="reportWorstDay">--</strong>
+            </div>
 
+            <div>
+              <span>Weekly Browsing</span>
+              <strong id="reportBrowsing">--</strong>
+            </div>
 
-<div class="card">
+            <div>
+              <span>Tab Switches</span>
+              <strong id="reportSwitches">--</strong>
+            </div>
 
-<h3>Tab Switches</h3>
+            <div>
+              <span>Most Used Website</span>
+              <strong id="reportTopSite">--</strong>
+            </div>
 
-<p id="switches"></p>
+            <div>
+              <span>Longest Session</span>
+              <strong id="reportLongest">--</strong>
+            </div>
 
-</div>
+            <div>
+              <span>Average Session</span>
+              <strong id="reportAverageSession">--</strong>
+            </div>
 
+            <div>
+              <span>Productivity Grade</span>
+              <strong id="reportGrade">--</strong>
+            </div>
+          </div>
 
-<div class="card">
-
-<h3>Sites Visited</h3>
-
-<p id="siteCount"></p>
-
-</div>
-
-</div>
-
-
-<h2>Weekly Summary</h2>
-
-<div class="cards">
-
-    <div class="card">
-        <h3>Weekly Average</h3>
-        <p id="weeklyAverage"></p>
+          <button id="downloadWeeklyReport" class="primary-btn">
+            Download Weekly Report
+          </button>
+        </div>
+      </section>
     </div>
 
-    <div class="card">
-        <h3>Best Day</h3>
-        <p id="bestDay"></p>
-    </div>
-
-    <div class="card">
-        <h3>Needs Improvement</h3>
-        <p id="worstDay"></p>
-    </div>
-
-    <div class="card">
-        <h3>Weekly Browsing</h3>
-        <p id="weeklyTime"></p>
-    </div>
-
-    <div class="card">
-        <h3>Weekly Switches</h3>
-        <p id="weeklySwitches"></p>
-    </div>
-
-</div>
-
-<h2>Focus History (Last 7 Days)</h2>
-
-<table id="historyTable">
-
-    <thead>
-
-        <tr>
-
-            <th>Date</th>
-
-            <th>Focus Score</th>
-
-            <th>Browsing Time</th>
-
-            <th>Tab Switches</th>
-
-        </tr>
-
-    </thead>
-
-    <tbody id="historyBody">
-
-    </tbody>
-
-</table>
-
-<h2>Top Websites</h2>
-
-<div id="topSites"></div>
-
-</div>
-
-</div>
-
-<script src="dashboard.js"></script>
-
-</body>
-
+    <script type="module" src="dashboard.js"></script>
+  </body>
 </html>
