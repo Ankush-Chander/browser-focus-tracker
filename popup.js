@@ -1,267 +1,204 @@
-function getToday() {
-    return new Date().toISOString().split("T")[0];
+import {
+  getToday,
+  formatTime,
+  calculateTotalTime,
+  calculateFocusScore,
+  zoneForScore,
+  ZONE_LABEL,
+  needleAngle,
+} from "./utils.js";
+
+function updateGauge(score) {
+  const needleGroup = document.getElementById("needleGroup");
+
+  needleGroup.setAttribute(
+    "transform",
+    `rotate(${needleAngle(score)} 100 110)`,
+  );
+
+  document.getElementById("focusScore").textContent = score;
+
+  document.getElementById("focusLabel").textContent =
+    ZONE_LABEL[zoneForScore(score)];
 }
 
-function calculateFocusScore(stats) {
+function updateTopSites(stats) {
+  const container = document.getElementById("sites");
 
-    let score = 100;
+  container.innerHTML = "";
 
-    // Frequent tab switching reduces focus
-    score -= stats.switches * 1.5;
+  const entries = Object.entries(stats?.sites || {})
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6);
 
-    // Very short visits indicate distraction
-    score -= stats.shortVisits * 3;
+  container.classList.toggle("is-empty", entries.length === 0);
 
-    // Too many different websites may indicate loss of focus
-    const siteCount = Object.keys(stats.sites).length;
+  document
+    .getElementById("sitesEmptyNote")
+    .classList.toggle("is-visible", entries.length === 0);
 
-    if (siteCount > 15) {
-        score -= 10;
-    }
+  entries.forEach(([domain, time]) => {
+    const li = document.createElement("li");
 
-    return Math.max(
-        0,
-        Math.min(100, Math.round(score))
-    );
+    const domainSpan = document.createElement("span");
+
+    domainSpan.className = "site-domain";
+    domainSpan.textContent = domain;
+
+    const timeSpan = document.createElement("span");
+
+    timeSpan.className = "site-time";
+    timeSpan.textContent = formatTime(time);
+
+    li.appendChild(domainSpan);
+    li.appendChild(timeSpan);
+
+    container.appendChild(li);
+  });
 }
 
-function formatTime(ms) {
+// The "Most Used Today" readout was in the markup but nothing
+// ever set its text - it just sat on "-" permanently. The top
+// site is already the first (highest-time) entry once
+// stats.sites is sorted, so reuse that instead of resorting.
+function updateTopSite(stats) {
+  const topSiteElement = document.getElementById("topSite");
 
-    const totalMinutes =
-        Math.floor(ms / 60000);
+  const entries = Object.entries(stats?.sites || {}).sort(
+    (a, b) => b[1] - a[1],
+  );
 
-    const hours =
-        Math.floor(totalMinutes / 60);
+  if (entries.length === 0) {
+    topSiteElement.textContent = "-";
 
-    const minutes =
-        totalMinutes % 60;
+    return;
+  }
 
-    if (hours > 0) {
-        return `${hours}h ${minutes}m`;
-    }
+  const [domain, time] = entries[0];
 
-    return `${minutes}m`;
+  topSiteElement.textContent = `${domain} • ${formatTime(time)}`;
 }
 
 async function loadStats() {
+  const storage = await chrome.storage.local.get("dailyStats");
 
-    const storage =
-        await chrome.storage.local.get(
-            "dailyStats"
-        );
+  const today = getToday();
 
-    const today =
-        getToday();
+  const stats = storage.dailyStats?.[today];
 
-    const stats =
-        storage.dailyStats?.[today];
+  // Live tab count is real regardless of whether today's
+  // stats exist yet, so it's shown independent of the
+  // empty state below.
+  const liveTabs = (await chrome.tabs.query({})).length;
 
-    if (!stats) {
+  document.getElementById("openTabs").textContent = liveTabs;
 
-        document.getElementById(
-            "focusScore"
-        ).textContent =
-            "No data collected today.";
+  const readingSection = document.getElementById("readingSection");
 
-        return;
-    }
+  const totalTimeReadout = document.getElementById("totalTimeReadout");
 
-    const score =
-        calculateFocusScore(stats);
+  const switchesReadout = document.getElementById("switchesReadout");
 
-    const focusScoreElement =
-        document.getElementById(
-            "focusScore"
-        );
+  const maxTabsReadout = document.getElementById("maxTabsReadout");
 
-    focusScoreElement.classList.remove(
-        "good",
-        "average",
-        "poor"
-    );
+  if (!stats) {
+    readingSection.classList.add("is-empty");
 
-    if (score >= 80) {
+    totalTimeReadout.classList.add("is-hidden");
+    switchesReadout.classList.add("is-hidden");
+    maxTabsReadout.classList.add("is-hidden");
 
-        focusScoreElement.classList.add(
-            "good"
-        );
+    updateTopSite(null);
+    updateTopSites(null);
 
-    }
-    else if (score >= 50) {
+    return;
+  }
 
-        focusScoreElement.classList.add(
-            "average"
-        );
+  readingSection.classList.remove("is-empty");
 
-    }
-    else {
+  totalTimeReadout.classList.remove("is-hidden");
+  switchesReadout.classList.remove("is-hidden");
+  maxTabsReadout.classList.remove("is-hidden");
 
-        focusScoreElement.classList.add(
-            "poor"
-        );
+  updateGauge(calculateFocusScore(stats));
 
-    }
+  document.getElementById("totalTime").textContent = formatTime(
+    calculateTotalTime(stats.sites),
+  );
 
-    focusScoreElement.textContent =
-        `Focus Score: ${score}/100`;
+  document.getElementById("switches").textContent = stats.switches || 0;
 
-    document.getElementById(
-        "switches"
-    ).textContent =
-        `Tab Switches: ${stats.switches}`;
+  document.getElementById("maxTabs").textContent = stats.maxTabs || 0;
 
-    let totalTime = 0;
-
-    Object.values(stats.sites)
-        .forEach(time => {
-
-            totalTime += time;
-
-        });
-
-    const totalTimeElement =
-        document.getElementById(
-            "totalTime"
-        );
-
-    if (totalTimeElement) {
-
-        totalTimeElement.textContent =
-            `Total Browsing Time: ${formatTime(totalTime)}`;
-
-    }
-
-    const sitesContainer =
-        document.getElementById(
-            "sites"
-        );
-
-    sitesContainer.innerHTML = "";
-
-    const sortedSites =
-        Object.entries(stats.sites)
-            .sort(
-                (a, b) => b[1] - a[1]
-            )
-            .slice(0, 10);
-
-    sortedSites.forEach(
-        ([domain, time]) => {
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-            div.className = "site";
-
-            div.textContent =
-                `${domain} - ${formatTime(time)}`;
-
-            sitesContainer.appendChild(
-                div
-            );
-        }
-    );
+  updateTopSite(stats);
+  updateTopSites(stats);
 }
 
+document.getElementById("resetBtn").addEventListener("click", async () => {
+  const storage = await chrome.storage.local.get("dailyStats");
 
-document
-    .getElementById("resetBtn")
-    .addEventListener(
-        "click",
-        async () => {
+  const today = getToday();
 
-            const storage =
-                await chrome.storage.local.get(
-                    "dailyStats"
-                );
+  if (storage.dailyStats && storage.dailyStats[today]) {
+    delete storage.dailyStats[today];
 
-            const today =
-                getToday();
-
-            if (
-                storage.dailyStats &&
-                storage.dailyStats[today]
-            ) {
-
-                delete storage.dailyStats[today];
-
-                await chrome.storage.local.set({
-                    dailyStats:
-                        storage.dailyStats
-                });
-            }
-
-            location.reload();
-
-        }
-    );
-
-
-document
-    .getElementById("exportBtn")
-    .addEventListener(
-        "click",
-        async () => {
-
-            const storage =
-                await chrome.storage.local.get(
-                    "dailyStats"
-                );
-
-            const blob =
-                new Blob(
-                    [
-                        JSON.stringify(
-                            storage.dailyStats,
-                            null,
-                            2
-                        )
-                    ],
-                    {
-                        type:
-                            "application/json"
-                    }
-                );
-
-            const url =
-                URL.createObjectURL(
-                    blob
-                );
-
-            chrome.downloads.download({
-
-                url,
-
-                filename:
-                    "focus-tracker-report.json"
-
-            });
-
-        }
-    );
-
-document
-    .getElementById(
-        "dashboardBtn"
-    )
-    
-    .addEventListener(
-        "click",
-    ()=>{
-
-        chrome.tabs.create({
-
-            url:
-
-                chrome.runtime.getURL(
-                    "dashboard.html"
-                )
-
-        });
-
+    await chrome.storage.local.set({
+      dailyStats: storage.dailyStats,
     });
+  }
 
+  location.reload();
+});
+
+document.getElementById("exportBtn").addEventListener("click", async () => {
+  const storage = await chrome.storage.local.get("dailyStats");
+
+  const blob = new Blob([JSON.stringify(storage.dailyStats, null, 2)], {
+    type: "application/json",
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  chrome.downloads.download({
+    url,
+
+    filename: "focus-tracker-report.json",
+  });
+});
+
+document.getElementById("dashboardBtn").addEventListener("click", () => {
+  chrome.tabs.create({
+    url: chrome.runtime.getURL("dashboard.html"),
+  });
+});
 
 loadStats();
+
+/* -----------------------------
+   Keep the popup live instead of a one-time snapshot.
+
+   loadStats() used to run exactly once, when the popup first
+   loaded. If the popup stays open for a while - dragged out
+   via "Inspect popup", or just left open longer than usual -
+   it would keep showing whatever was true the moment it
+   opened, no matter how much time passed or how many tabs you
+   switched through afterward.
+
+   1. React immediately whenever background.js writes new data
+      (auto-save alarm, tab switch, navigation, tab count
+      change) - this is the primary, near-instant path.
+   2. A periodic poll as a backstop, mainly so the live "Open
+      Tabs" count (which isn't itself stored, so a storage
+      change elsewhere doesn't always accompany it) stays
+      current even if nothing else changes for a while.
+------------------------------*/
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== "local") return;
+
+  if (changes.dailyStats || changes.currentTabCount) {
+    loadStats();
+  }
+});
+
+setInterval(loadStats, 15000);
