@@ -150,21 +150,122 @@ document.getElementById("resetBtn").addEventListener("click", async () => {
   location.reload();
 });
 
-document.getElementById("exportBtn").addEventListener("click", async () => {
-  const storage = await chrome.storage.local.get("dailyStats");
+async function exportJSON() {
+  try {
+    const storage = await chrome.storage.local.get("dailyStats");
 
-  const blob = new Blob([JSON.stringify(storage.dailyStats, null, 2)], {
-    type: "application/json",
-  });
+    const blob = new Blob([JSON.stringify(storage.dailyStats, null, 2)], {
+      type: "application/json",
+    });
 
-  const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
-  chrome.downloads.download({
-    url,
+    try {
+      await chrome.downloads.download({
+        url,
+        filename: `focus-tracker-${getToday()}.json`,
+        saveAs: false,
+        conflictAction: "uniquify",
+      });
 
-    filename: "focus-tracker-report.json",
-  });
-});
+      showToast("JSON exported successfully");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  } catch (error) {
+    console.error("JSON export failed:", error);
+    showToast("JSON export failed");
+  }
+}
+
+document.getElementById("exportBtn").addEventListener("click", exportJSON);
+
+function csvEscape(value) {
+  const str = String(value);
+
+  if (/[",\n]/.test(str)) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+
+  return str;
+}
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(showToast._timer);
+
+  showToast._timer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+}
+
+async function exportCSV() {
+  try {
+    const storage = await chrome.storage.local.get("dailyStats");
+
+    const dailyStats = storage.dailyStats || {};
+
+    const header = [
+      "Date",
+      "Focus Score",
+      "Total Time (min)",
+      "Switches",
+      "Site Count",
+      "Max Tabs",
+    ];
+
+    const rows = Object.entries(dailyStats)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, stats]) => {
+        const totalMinutes = Math.round(
+          calculateTotalTime(stats.sites) / 60000,
+        );
+
+        return [
+          date,
+          calculateFocusScore(stats),
+          totalMinutes,
+          stats.switches || 0,
+          Object.keys(stats.sites || {}).length,
+          stats.maxTabs || 0,
+        ];
+      });
+
+    const csv = [header, ...rows]
+      .map((row) => row.map(csvEscape).join(","))
+      .join("\r\n");
+
+    const blob = new Blob([csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    try {
+      await chrome.downloads.download({
+        url,
+        filename: `focus-tracker-${getToday()}.csv`,
+        saveAs: false,
+        conflictAction: "uniquify",
+      });
+
+      showToast("CSV exported successfully");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  } catch (error) {
+    console.error("CSV export failed:", error);
+    showToast("CSV export failed");
+  }
+}
+
+document.getElementById("exportCsvBtn").addEventListener("click", exportCSV);
 
 document.getElementById("dashboardBtn").addEventListener("click", () => {
   chrome.tabs.create({
