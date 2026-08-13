@@ -6,6 +6,7 @@ import {
   zoneForScore,
   ZONE_LABEL,
   needleAngle,
+  getGradeLetter,
 } from "./utils.js";
 
 /* -----------------------------
@@ -24,18 +25,6 @@ function updateGauge(score) {
 
   document.getElementById("focusLabel").textContent =
     ZONE_LABEL[zoneForScore(score)];
-}
-
-/* -----------------------------
-   Shared: letter grade from a 0-100 score. Used by both
-   today's Insights card and the weekly report.
-------------------------------*/
-
-function getGradeLetter(score) {
-  if (score >= 90) return "A";
-  if (score >= 80) return "B";
-  if (score >= 65) return "C";
-  return "D";
 }
 
 /* -----------------------------
@@ -77,16 +66,36 @@ function updateTopSites(stats) {
 
     li.className = "site-card";
 
-    li.innerHTML = `
-            <div class="site-header">
-                <span class="site-domain">${domain}</span>
-                <span class="site-percent">${percentage}%</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width:${percentage}%"></div>
-            </div>
-            <div class="site-time">${formatTime(time)}</div>
-        `;
+    const header = document.createElement("div");
+    header.className = "site-header";
+
+    const domainSpan = document.createElement("span");
+    domainSpan.className = "site-domain";
+    domainSpan.textContent = domain;
+
+    const percentSpan = document.createElement("span");
+    percentSpan.className = "site-percent";
+    percentSpan.textContent = `${percentage}%`;
+
+    header.appendChild(domainSpan);
+    header.appendChild(percentSpan);
+
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar";
+
+    const progressFill = document.createElement("div");
+    progressFill.className = "progress-fill";
+    progressFill.style.width = `${percentage}%`;
+
+    progressBar.appendChild(progressFill);
+
+    const timeDiv = document.createElement("div");
+    timeDiv.className = "site-time";
+    timeDiv.textContent = formatTime(time);
+
+    li.appendChild(header);
+    li.appendChild(progressBar);
+    li.appendChild(timeDiv);
 
     container.appendChild(li);
   });
@@ -262,13 +271,19 @@ function updateHistoryTable(dailyStats) {
   rows.forEach(([date, stats]) => {
     const row = document.createElement("tr");
 
-    row.innerHTML = `
-            <td>${date}</td>
-            <td>${calculateFocusScore(stats)}/100</td>
-            <td>${formatTime(calculateTotalTime(stats.sites))}</td>
-            <td>${stats.switches || 0}</td>
-            <td>${stats.maxTabs || 0}</td>
-        `;
+    const cells = [
+      date,
+      `${calculateFocusScore(stats)}/100`,
+      formatTime(calculateTotalTime(stats.sites)),
+      stats.switches || 0,
+      stats.maxTabs || 0,
+    ];
+
+    cells.forEach((value) => {
+      const td = document.createElement("td");
+      td.textContent = value;
+      row.appendChild(td);
+    });
 
     body.appendChild(row);
   });
