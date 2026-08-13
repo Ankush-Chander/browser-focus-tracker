@@ -180,6 +180,11 @@ Possible future enhancements include:
 - Focus session reminders
 - Website categorization
 - Chrome Web Store publication
+- Weight the focus score by time-of-day and session length. The
+  current formula (flat -1.5 per switch, -3 per short visit, -10
+  if more than 15 sites) is a straightforward v1 heuristic and
+  doesn't yet account for when a session happened or how long it
+  ran.
 
 ---
 
