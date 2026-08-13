@@ -420,6 +420,26 @@ function updateWeeklyReport(dailyStats, weekly) {
 }
 
 /* -----------------------------
+   Toast (mirrors popup.js's helper so both surfaces give
+   the same feedback on download success/failure)
+------------------------------*/
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(showToast._timer);
+
+  showToast._timer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+}
+
+/* -----------------------------
    Masthead date
 ------------------------------*/
 
@@ -560,10 +580,21 @@ ${new Date().toLocaleString()}
 
     const url = URL.createObjectURL(blob);
 
-    chrome.downloads.download({
-      url,
+    try {
+      await chrome.downloads.download({
+        url,
 
-      filename: `weekly-report-${new Date().toISOString().split("T")[0]}.txt`,
-    });
+        filename: `weekly-report-${new Date().toISOString().split("T")[0]}.txt`,
+        saveAs: false,
+        conflictAction: "uniquify",
+      });
+
+      showToast("Weekly report downloaded");
+    } catch (error) {
+      console.error("Weekly report download failed:", error);
+      showToast("Download failed");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   },
 );
