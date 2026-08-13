@@ -1,6 +1,22 @@
 import { getToday, getDomain } from "./utils.js";
 
 /* -----------------------------
+   Debug logging - gated behind a flag so instrumentation can
+   stay in the source (useful for diagnosing issues in the
+   wild, where you can't attach a debugger to a user's
+   browser) without spamming the console by default. Flip
+   DEBUG to true locally when you need it.
+------------------------------*/
+
+const DEBUG = false;
+
+function log(...args) {
+  if (DEBUG) {
+    console.log(...args);
+  }
+}
+
+/* -----------------------------
    NOTE ON SERVICE WORKER LIFECYCLE
    Manifest V3 service workers can be killed and
    restarted by Chrome at any time (e.g. after ~30s
@@ -122,7 +138,7 @@ async function updateTabCount() {
 ------------------------------*/
 
 async function saveCurrentSession({ countShortVisit = true } = {}) {
-  console.log("Saving session");
+  log("Saving session");
   if (isSaving) return;
 
   isSaving = true;
@@ -141,7 +157,7 @@ async function saveCurrentSession({ countShortVisit = true } = {}) {
       if (!domain || !start) return;
 
       const duration = Date.now() - start;
-      console.log(
+      log(
         "SAVE:",
         "domain =",
         domain,
@@ -245,7 +261,7 @@ async function stopTracking() {
   // countShortVisit: false - stopTracking always represents
   // an interruption (lost focus, idle, locked), never the
   // person deliberately hopping to a different site.
-  console.log("stopTracking called");
+  log("stopTracking called");
   await saveCurrentSession({ countShortVisit: false });
 
   await chrome.storage.local.remove("sessionStart");
@@ -337,7 +353,7 @@ chrome.alarms.create(AUTO_SAVE_ALARM, {
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-  console.log("Alarm fired:", alarm.name);
+  log("Alarm fired:", alarm.name);
 
   // Must be async + awaited here. If this listener returns
   // before the write to chrome.storage actually finishes,
@@ -444,7 +460,7 @@ chrome.runtime.onStartup.addListener(async () => {
 ------------------------------*/
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  console.log("onUpdated:", changeInfo);
+  log("onUpdated:", changeInfo);
   // Ignore updates that are not page navigations
   if (!changeInfo.url) return;
 
@@ -510,7 +526,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
 ------------------------------*/
 
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
-  console.log("Window focus:", windowId);
+  log("Window focus:", windowId);
 
   // Browser temporarily lost focus
   if (windowId === chrome.windows.WINDOW_ID_NONE) {
