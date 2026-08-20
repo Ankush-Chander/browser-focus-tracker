@@ -1,4 +1,4 @@
-# 🧠 Focus Tracker
+# 🧠 Focus Pulse
 
 A **privacy-first Chrome Extension** that helps users understand and improve their browsing habits by tracking website usage, measuring focus, and providing insightful analytics—all while keeping data stored **locally on the user's device**.
 
@@ -6,7 +6,7 @@ A **privacy-first Chrome Extension** that helps users understand and improve the
 
 ## 📌 Overview
 
-Focus Tracker is designed to help users become more aware of their browsing behavior without compromising their privacy.
+Focus Pulse is designed to help users become more aware of their browsing behavior without compromising their privacy.
 
 Unlike cloud-based productivity tools, this extension stores all browsing statistics locally using the Chrome Storage API. No personal browsing data is sent to external servers.
 
@@ -80,7 +80,7 @@ The extension monitors website usage, calculates a daily focus score, provides p
 # 📂 Project Structure
 
 ```
-Focus-Tracker/
+browser-focus-tracker/
 │
 │
 ├── icons/
@@ -159,7 +159,7 @@ The score is translated into a productivity grade ranging from **A** to **D**.
 
 # 🔐 Privacy
 
-Focus Tracker follows a **local-first architecture**.
+Focus Pulse follows a **local-first architecture**.
 
 - No external servers
 - No cloud storage

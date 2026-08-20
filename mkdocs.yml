@@ -1,0 +1,90 @@
+site_name: Focus Pulse
+site_description: >-
+  A privacy-first Chrome extension that measures how you spend your browsing
+  time and turns it into a daily focus score. Everything stays on your device.
+site_url: https://jainam249.github.io/browser-focus-tracker/
+site_author: Jainam Shah
+
+repo_url: https://github.com/Jainam249/browser-focus-tracker
+repo_name: Jainam249/browser-focus-tracker
+edit_uri: edit/main/docs/
+
+copyright: Built by Jainam Shah &middot; MIT-spirited, local-first, no telemetry
+
+theme:
+  name: material
+  language: en
+  palette:
+    # Light scheme
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    # Dark scheme
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font:
+    text: IBM Plex Sans
+    code: IBM Plex Mono
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - navigation.sections
+    - content.code.copy
+    - content.action.edit
+    - search.suggest
+    - search.highlight
+    - toc.follow
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+      permalink_title: Link to this section
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.smartsymbols
+  - pymdownx.tilde
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Jainam249/browser-focus-tracker
+      name: Focus Pulse on GitHub
+  # Material ships an analytics hook; deliberately left unset.
+  # This project claims zero telemetry, and the docs site honours that too.
+
+nav:
+  - Overview: index.md
+  - Install: install.md
+  - How it works: how-it-works.md
+  - Privacy: privacy.md
+  - Changelog: changelog.md
+

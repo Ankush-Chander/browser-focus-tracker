@@ -538,7 +538,7 @@ document.getElementById("downloadWeeklyReport").addEventListener(
 
   async () => {
     const report = `
-FOCUS TRACKER
+FOCUS PULSE
 WEEKLY REPORT
 
 ==========================

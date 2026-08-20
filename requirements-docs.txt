@@ -1,0 +1,4 @@
+# Documentation site toolchain.
+# The extension itself has no build step and no dependencies — this file
+# is only needed to build and deploy the MkDocs site under docs/.
+mkdocs-material==9.7.7

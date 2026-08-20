@@ -163,7 +163,7 @@ async function exportJSON() {
     try {
       await chrome.downloads.download({
         url,
-        filename: `focus-tracker-${getToday()}.json`,
+        filename: `focus-pulse-${getToday()}.json`,
         saveAs: false,
         conflictAction: "uniquify",
       });
@@ -250,7 +250,7 @@ async function exportCSV() {
     try {
       await chrome.downloads.download({
         url,
-        filename: `focus-tracker-${getToday()}.csv`,
+        filename: `focus-pulse-${getToday()}.csv`,
         saveAs: false,
         conflictAction: "uniquify",
       });

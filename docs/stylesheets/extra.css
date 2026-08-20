@@ -1,0 +1,140 @@
+/* Focus Pulse docs — forest-green identity carried over from the
+   extension's own surfaces, so the site doesn't read as stock Material.
+   Neutrals are biased slightly green rather than pure grey. */
+
+:root {
+  --ft-green: #2E6B47;
+  --ft-green-deep: #235238;
+  --ft-green-lift: #77C598;
+  --ft-flag: #8A5A1B;
+  --ft-flag-soft: #F6ECDC;
+}
+
+/* ---- light scheme ---- */
+
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: var(--ft-green);
+  --md-primary-fg-color--light: #3F8259;
+  --md-primary-fg-color--dark: var(--ft-green-deep);
+  --md-accent-fg-color: var(--ft-green-deep);
+
+  --md-default-bg-color: #F5F7F3;
+  --md-typeset-a-color: var(--ft-green-deep);
+  --md-code-bg-color: #E9EEE6;
+  --md-footer-bg-color: #171B15;
+}
+
+/* ---- dark scheme ---- */
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #1E2A22;
+  --md-primary-fg-color--light: #2E6B47;
+  --md-primary-fg-color--dark: #141C17;
+  --md-accent-fg-color: var(--ft-green-lift);
+
+  --md-hue: 140;
+  --md-default-bg-color: #0F120E;
+  --md-typeset-a-color: var(--ft-green-lift);
+  --md-code-bg-color: #1A201A;
+}
+
+/* Headings get a little more presence than Material's default. */
+
+.md-typeset h1,
+.md-typeset h2 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.md-typeset h2 {
+  border-top: 2px solid var(--md-default-fg-color--light);
+  padding-top: 0.5rem;
+  margin-top: 2.2em;
+}
+
+/* Tables: the permissions table is the centrepiece of the privacy
+   page, so give it room and keep the "leaves device" column tight. */
+
+.md-typeset table:not([class]) {
+  font-size: 0.76rem;
+}
+
+.md-typeset table:not([class]) th {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.66rem;
+}
+
+/* Facts strip on the overview page. */
+
+.ft-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--md-default-fg-color--lightest);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 1.4em 0;
+}
+
+.ft-fact {
+  background: var(--md-default-bg-color);
+  padding: 0.9rem 1rem;
+}
+
+.ft-fact b {
+  display: block;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  color: var(--md-primary-fg-color--light);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-md-color-scheme="slate"] .ft-fact b {
+  color: var(--ft-green-lift);
+}
+
+.ft-fact span {
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+  line-height: 1.4;
+}
+
+/* A "stays on device" chip, reused in the permissions table. */
+
+.ft-chip {
+  display: inline-block;
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ft-green-deep);
+  background: #E4EEE7;
+  border-radius: 999px;
+  padding: 0.16rem 0.5rem;
+  white-space: nowrap;
+}
+
+[data-md-color-scheme="slate"] .ft-chip {
+  color: #9BD8B4;
+  background: #1A2A20;
+}
+
+/* Placeholder token that must be replaced before publishing. */
+
+.ft-placeholder {
+  font-family: var(--md-code-font-family, monospace);
+  font-size: 0.86em;
+  background: var(--ft-flag-soft);
+  color: var(--ft-flag);
+  border-bottom: 1px dashed var(--ft-flag);
+  padding: 0.1em 0.3em;
+  border-radius: 2px;
+}
+
+[data-md-color-scheme="slate"] .ft-placeholder {
+  background: #2A2113;
+  color: #D9AC6A;
+}

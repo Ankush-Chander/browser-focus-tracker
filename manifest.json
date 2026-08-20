@@ -1,17 +1,20 @@
 {
   "manifest_version": 3,
-  "name": "FocusTracker",
+  "name": "FocusPulse",
   "version": "1.0",
-  "description": "Track focus and tab switching behavior",
+  "description": "Measure focus and tab switching behavior",
 
-  "permissions": [
-    "tabs",
-    "storage",
-    "downloads",
-    "idle",
-    "alarms"
-  ],
-  
+  "icons": {
+    "16": "icons/focus_pulse_logo-16.ico",
+    "32": "icons/focus_pulse_logo-32.ico",
+    "48": "icons/focus_pulse_logo-48.ico",
+    "64": "icons/focus_pulse_logo-64.ico",
+    "128": "icons/focus_pulse_logo-128.ico",
+    "256": "icons/focus_pulse_logo-256.ico"
+  },
+
+  "permissions": ["tabs", "storage", "downloads", "idle", "alarms"],
+
   "background": {
     "service_worker": "background.js",
     "type": "module"

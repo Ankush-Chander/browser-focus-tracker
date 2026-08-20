@@ -29,7 +29,7 @@ function log(...args) {
 let isSaving = false;
 let focusLossTimer = null;
 
-const AUTO_SAVE_ALARM = "focusTrackerAutoSave";
+const AUTO_SAVE_ALARM = "focusPulseAutoSave";
 
 // 5 minutes, not the previous 60 seconds. chrome.idle only
 // measures physical keyboard/mouse input - 60s is far too
