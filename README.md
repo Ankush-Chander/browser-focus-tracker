@@ -27,7 +27,7 @@ The extension monitors website usage, calculates a daily focus score, provides p
 ### 🎯 Focus Analysis
 
 - Daily Focus Score
-- Productivity Grade (A–F)
+- Productivity Grade (A–D)
 - Focus Zone classification
 - Longest browsing session
 - Average session length
@@ -153,7 +153,7 @@ The Focus Score is calculated using browsing behavior, including:
 - Number of short browsing sessions
 - Browsing consistency
 
-The score is translated into a productivity grade ranging from **A** to **F**.
+The score is translated into a productivity grade ranging from **A** to **D**.
 
 ---
 
