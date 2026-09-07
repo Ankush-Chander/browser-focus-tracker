@@ -1,5 +1,11 @@
 # Chrome Web Store — Privacy Practices Submission
 
+> **Status: published.** Focus Pulse is live at
+> <https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn>.
+> The blockers listed at the bottom of this file were resolved before
+> submission. Keep this document as the reference for the answers on file —
+> reuse it when editing the listing or submitting a new version.
+
 Copy each block into the matching field on the **Privacy practices** tab of the
 item edit page. Text is written to fit the store's field limits and reviewer
 expectations (state the feature, then the permission's role in it).
@@ -151,17 +157,10 @@ On the Privacy practices tab, the truthful selections are:
 
 ---
 
-## Remaining blockers (manual — cannot be done from the codebase)
+## Publisher contact (resolved)
 
-These two items are account settings, not code or copy:
-
-1. **Publisher contact email** — Developer Dashboard → **Account** / item
-   **Settings** page → enter a contact email address.
-2. **Verify that email** — Google sends a verification link to that address;
-   open it and confirm. The item stays unpublishable until the address shows as
-   verified.
-
-Both must be completed by the account owner before the item can be submitted.
+The publisher contact email on file is **sjainam141@gmail.com**, verified in the
+Developer Dashboard before submission.
 
 ---
 

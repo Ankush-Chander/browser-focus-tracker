@@ -78,6 +78,9 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/Jainam249/browser-focus-tracker
       name: Focus Pulse on GitHub
+    - icon: fontawesome/brands/chrome
+      link: https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn
+      name: Focus Pulse on the Chrome Web Store
   # Material ships an analytics hook; deliberately left unset.
   # This project claims zero telemetry, and the docs site honours that too.
 

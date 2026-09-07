@@ -7,9 +7,15 @@ description: Development history of Focus Pulse, from the first tracking prototy
 
 Focus Pulse has not yet cut tagged releases, so this history is reconstructed
 from the repository's commits. Version **1.0** is the current manifest version
-and the one prepared for the Chrome Web Store.
+and the one
+[published to the Chrome Web Store](https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn).
 
-## 1.0 — in preparation
+## 1.0 — published
+
+**22 August 2026**
+
+- **Published to the Chrome Web Store.** Focus Pulse is now installable at
+  [chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn](https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn).
 
 The submission-ready build. Scoring was centralised so the popup, dashboard, and
 weekly report can no longer disagree with each other, and the tracking worker was

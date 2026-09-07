@@ -7,12 +7,17 @@ description: How to install Focus Pulse from the Chrome Web Store, or load it un
 
 ## From the Chrome Web Store
 
-Focus Pulse is pending its first Chrome Web Store release. Once published, the
-listing link will appear here.
+Focus Pulse is live on the Chrome Web Store. This is the recommended way to
+install it — Chrome keeps it updated for you.
 
-!!! note "Store listing not live yet"
-    Until then, use the unpacked install below. It is the same code — the store
-    package is built from this repository without modification.
+[Install from the Chrome Web Store](https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn){ .md-button .md-button--primary }
+
+1. Open the [store listing](https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn).
+2. Click **Add to Chrome**, then confirm the permissions prompt.
+3. Pin the Focus Pulse icon to your toolbar so today's score is one click away.
+
+The store package is built from this repository without modification, so the
+code you install is the code you can read here.
 
 ## Load unpacked (developers)
 

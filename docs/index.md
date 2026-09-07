@@ -21,8 +21,13 @@ because there is nowhere to upload it to.
 <div class="ft-fact"><b>Local</b><span>storage only, erased when you uninstall</span></div>
 </div>
 
-[Install it](install.md){ .md-button .md-button--primary }
+[Add to Chrome](https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn){ .md-button .md-button--primary }
+[Installation options](install.md){ .md-button }
 [Read the privacy policy](privacy.md){ .md-button }
+
+Focus Pulse is available on the Chrome Web Store, or you can
+[load it unpacked](install.md#load-unpacked-developers) straight from the
+repository.
 
 ## What it measures
 

@@ -136,10 +136,6 @@ your device would be stated here plainly.
 ## Contact
 
 Questions about this policy, or about the extension's handling of data, can be
-sent to <span class="ft-placeholder">your-contact-email@example.com</span>.
-
-!!! warning "Placeholder — replace before publishing"
-    The contact address above is a placeholder. Replace it in
-    `docs/privacy.md` with the same address you verify as the publisher
-    contact in the Chrome Web Store Developer Dashboard, then redeploy.
-    This admonition can be deleted at the same time.
+sent to <sjainam141@gmail.com>. This is the same address verified as the
+publisher contact on the
+[Chrome Web Store listing](https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn).

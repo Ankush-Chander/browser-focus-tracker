@@ -6,8 +6,6 @@
   --ft-green: #2E6B47;
   --ft-green-deep: #235238;
   --ft-green-lift: #77C598;
-  --ft-flag: #8A5A1B;
-  --ft-flag-soft: #F6ECDC;
 }
 
 /* ---- light scheme ---- */
@@ -122,19 +120,3 @@
   background: #1A2A20;
 }
 
-/* Placeholder token that must be replaced before publishing. */
-
-.ft-placeholder {
-  font-family: var(--md-code-font-family, monospace);
-  font-size: 0.86em;
-  background: var(--ft-flag-soft);
-  color: var(--ft-flag);
-  border-bottom: 1px dashed var(--ft-flag);
-  padding: 0.1em 0.3em;
-  border-radius: 2px;
-}
-
-[data-md-color-scheme="slate"] .ft-placeholder {
-  background: #2A2113;
-  color: #D9AC6A;
-}

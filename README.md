@@ -1,5 +1,7 @@
 # 🧠 Focus Pulse
 
+**[Install from the Chrome Web Store](https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn)** &middot; **[Documentation](https://jainam249.github.io/browser-focus-tracker/)**
+
 A **privacy-first Chrome Extension** that helps users understand and improve their browsing habits by tracking website usage, measuring focus, and providing insightful analytics—all while keeping data stored **locally on the user's device**.
 
 ---
@@ -98,12 +100,31 @@ browser-focus-tracker/
 ├── utils.js               # Shared helper functions
 │
 ├── manifest.json          # Chrome extension configuration
+│
+├── docs/                  # MkDocs site sources (documentation website)
+├── mkdocs.yml             # Documentation site configuration
+├── requirements-docs.txt  # Documentation toolchain (mkdocs-material)
+│
+├── STORE_LISTING.md       # Chrome Web Store submission answers
 └── README.md
 ```
 
 ---
 
 # ⚙️ Installation
+
+## From the Chrome Web Store (recommended)
+
+Focus Pulse is published on the Chrome Web Store:
+
+**https://chromewebstore.google.com/detail/focuspulse/gcffkhpmcpjkmjmjeeiigbnjieoaennn**
+
+Click **Add to Chrome**, confirm the permissions prompt, and pin the icon to
+your toolbar. Chrome keeps the extension updated automatically.
+
+## Load unpacked (development)
+
+There is no build step — the repository *is* the extension.
 
 1. Clone this repository
 
@@ -179,12 +200,70 @@ Possible future enhancements include:
 - Monthly reports
 - Focus session reminders
 - Website categorization
-- Chrome Web Store publication
 - Weight the focus score by time-of-day and session length. The
   current formula (flat -1.5 per switch, -3 per short visit, -10
   if more than 15 sites) is a straightforward v1 heuristic and
   doesn't yet account for when a session happened or how long it
   ran.
+
+---
+
+# 📚 Documentation Website
+
+The user-facing documentation lives in `docs/` and is published as a static site
+with [MkDocs](https://www.mkdocs.org/) using the
+[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) theme.
+
+**Live site:** https://jainam249.github.io/browser-focus-tracker/
+
+```
+docs/
+├── index.md            # Overview / landing page
+├── install.md          # Install from the store or unpacked
+├── how-it-works.md     # Tracking model and focus score formula
+├── privacy.md          # Privacy policy (the URL used on the store listing)
+├── changelog.md        # Release history
+└── stylesheets/
+    └── extra.css       # Theme overrides and design tokens
+```
+
+The site configuration — navigation, theme, palette, markdown extensions — is
+in `mkdocs.yml`. Only the documentation site needs Python; the extension itself
+has no dependencies.
+
+## How to preview the site locally
+
+```bash
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements-docs.txt
+mkdocs serve
+```
+
+Open http://127.0.0.1:8000 — the site rebuilds and reloads on every save.
+
+## How to edit or add a page
+
+1. Edit the relevant Markdown file in `docs/`, or create a new one.
+2. If you added a page, register it under `nav:` in `mkdocs.yml`, otherwise it
+   will not appear in the navigation.
+3. Keep the YAML front matter (`title`, `description`) at the top of each page —
+   it drives the page title and search/social descriptions.
+4. Preview with `mkdocs serve` before committing.
+
+## How to build and deploy
+
+```bash
+mkdocs build          # renders the static site into site/ (git-ignored)
+mkdocs gh-deploy      # builds and pushes to the gh-pages branch
+```
+
+`mkdocs gh-deploy` publishes to GitHub Pages at the `site_url` configured in
+`mkdocs.yml`. Run it from `main` with a clean working tree.
+
+> **Note:** the **Privacy** page is the privacy policy URL registered on the
+> Chrome Web Store listing. If its path ever changes, update the listing in the
+> Developer Dashboard to match.
 
 ---
 
